@@ -5,14 +5,14 @@ namespace App\Providers;
 use App\Services\Chapter\ChapterService;
 use App\Services\Chapter\ChapterServiceInterface;
 use Illuminate\Support\ServiceProvider;
-use App\Services\Novel\NovelServiceInterface;
-use App\Services\Novel\NovelService;
+use App\Services\Fiction\FictionServiceInterface;
+use App\Services\Fiction\FictionService;
 
 class ServiceServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $this->app->bind(NovelServiceInterface::class, NovelService::class);
+        $this->app->bind(FictionServiceInterface::class, FictionService::class);
         $this->app->bind(ChapterServiceInterface::class, ChapterService::class);
     }
 }
