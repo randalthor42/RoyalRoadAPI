@@ -13,8 +13,8 @@ class NovelRepository implements NovelRepositoryInterface
         $this->novelService = $novelService;
     }
 
-    public function getNovel($id)
+    public function getNovel($id, $includes = [])
     {
-        return $this->novelService->getNovel($id);
+        return $this->novelService->getNovel($id, $includes);
     }
 }

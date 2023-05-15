@@ -9,12 +9,9 @@ class NovelTransformer
         return [
             'id' => $novel['id'],
             'title' => $novel['title'],
-            'author' => [
-                'name' => $novel['author'],
-                'link' => $novel['author_link'],
-            ],
             'tags' => $novel['tags'],
             'description' => $novel['description'],
+            'cover' => $novel['cover'],
         ];
     }
 }

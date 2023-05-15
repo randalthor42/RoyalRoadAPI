@@ -18,11 +18,11 @@ class NovelController extends Controller
         $this->transformer = $transformer;
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $novel = $this->novelRepository->getNovel($id);
-        $novel = $this->transformer->transform($novel);
-
+        $includes = explode(',', $request->get('include', ''));
+        $novel = $this->novelRepository->getNovel($id, $includes);
         return response()->json($novel);
     }
+    
 }
