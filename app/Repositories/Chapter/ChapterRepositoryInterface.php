@@ -4,5 +4,5 @@ namespace App\Repositories\Chapter;
 
 interface ChapterRepositoryInterface
 {
-    public function getChapters($novelId);
+    public function getChapters($novelId, $html = null);
 }

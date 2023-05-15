@@ -5,33 +5,77 @@ namespace App\Services\Chapter;
 use App\Services\Chapter\ChapterServiceInterface;
 use App\Transformers\ChapterTransformer;
 use simplehtmldom\HtmlWeb;
+use Exception;
 
 class ChapterService implements ChapterServiceInterface
 {
+    /** @var HtmlWeb */
     protected $htmlWeb;
+
+    /** @var ChapterTransformer */
     protected $chapterTransformer;
+
+    /** @var Array */
+    protected $chapters;
 
     public function __construct(HtmlWeb $htmlWeb, ChapterTransformer $chapterTransformer)
     {
         $this->htmlWeb = $htmlWeb;
         $this->chapterTransformer = $chapterTransformer;
     }
-    public function getChapters($novelId)
+
+    /**
+     * Returns all chapters.
+     *
+     * @param string $novelId
+     * @param HtmlWeb|null $html
+     * @return array
+     */
+    public function getChapters($novelId, $html = null)
     {
-        $url = "https://www.royalroad.com/fiction/{$novelId}";
+        if (!isset($this->chapters)) {
+            $this->chapters = $this->fetchChapters($novelId, $html);
+        }
+        return $this->chapters;
+    }
 
-        // Load the webpage
-        $html = $this->htmlWeb->load($url);
+    /**
+     * Fetches and transforms the chapters data.
+     *
+     * @param string $novelId
+     * @param HtmlWeb|null $html
+     * @return array
+     */
+    private function fetchChapters($novelId, $html = null)
+    {
+         // If $html is null, fetch it from the web
+        if ($html === null) {
+            $url = "https://www.royalroad.com/fiction/{$novelId}";
+            $html = $this->htmlWeb->load($url);
+        }
 
-        // Find the script tag containing the chapters data
-        $script = $html->find('script', 27)->innertext;
+        // Find all script tags
+        $scriptTags = $html->find('script');
+
+        // Find the script tag that contains 'window.chapters'
+        $script = null;
+        foreach ($scriptTags as $scriptTag) {
+            if (strpos($scriptTag->innertext, 'window.chapters') !== false) {
+                $script = $scriptTag;
+                break;
+            }
+        }
+
+        // Ensure script tag was found
+        if ($script === null) {
+            throw new Exception("Unable to find chapters data in script tags.");
+        }
 
         // Extract and decode the chapters data
-        preg_match('/window\.chapters = (\[.*?\]);/', $script, $matches);
+        preg_match('/window\.chapters = (\[.*?\]);/', $script->innertext, $matches);
         $chaptersJson = $matches[1] ?? '';
         $chapters = json_decode($chaptersJson, true);
-        $chapters = $this->chapterTransformer->transform($chapters);
 
-        return $chapters ;
+        return $this->chapterTransformer->transform($chapters);
     }
 }

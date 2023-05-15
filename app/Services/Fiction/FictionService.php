@@ -190,7 +190,7 @@ class FictionService implements FictionServiceInterface
         if ($this->chapterService === null) {
             throw new Exception("ChapterService is not set.");
         }
-        return $this->chapterService->findAll($id, $html);
+        return $this->chapterService->getChapters($id, $html);
     }
 
     /**
