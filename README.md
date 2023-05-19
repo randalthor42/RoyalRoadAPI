@@ -7,8 +7,8 @@ Welcome to the Fiction API, a RESTful API designed to interact with fiction stor
 - `GET /api/fiction/{id}`: Retrieve details of a specific fiction story.
 - `GET /api/fiction/{id}/?include=chapters`: Retrieve fiction info with a list of all its related chapters.
 - `GET /api/fiction/{id}/?include=chapters:chapterIndex`: Retrieve fiction info with the content of a specific chapter.
-- `GET /api/fiction/{id}/chapters`: Retrieve a chapter list only of a specific fiction
-- `GET /api/fiction/{id}/chapters/{chapterIndex}`: Retrieve a specific chapter with the content
+- `GET /api/fiction/{id}/chapters`: Retrieve a chapter list only of a specific fiction.
+- `GET /api/fiction/{id}/chapters/{chapterIndex}`: Retrieve a specific chapter with the content.
 
 ## Installation
 
