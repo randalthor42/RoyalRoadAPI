@@ -26,7 +26,7 @@ composer update
 
 3. Start the server.
 
-```bas
+```bash
 php artisan serve
 ```
 
