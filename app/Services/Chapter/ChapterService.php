@@ -2,10 +2,10 @@
 
 namespace App\Services\Chapter;
 
+use App\Parsers\ChapterHtmlParser;
 use App\Services\Chapter\ChapterServiceInterface;
 use App\Transformers\ChapterTransformer;
 use simplehtmldom\HtmlWeb;
-use Exception;
 
 class ChapterService implements ChapterServiceInterface
 {
@@ -55,8 +55,8 @@ class ChapterService implements ChapterServiceInterface
             $chapterUrl = "https://www.royalroad.com{$chapter['url']}";
             $chapter['content'] = $this->fetchChapterContent($chapterUrl);
         }
-        return $chapter;
 
+        return $chapter;
     }
 
     /**
@@ -68,33 +68,13 @@ class ChapterService implements ChapterServiceInterface
      */
     private function fetchChapters($novelId, $html = null)
     {
-         // If $html is null, fetch it from the web
+       // If $html is null, fetch it from the web
         if ($html === null) {
             $url = "https://www.royalroad.com/fiction/{$novelId}";
             $html = $this->htmlWeb->load($url);
         }
 
-        // Find all script tags
-        $scriptTags = $html->find('script');
-
-        // Find the script tag that contains 'window.chapters'
-        $script = null;
-        foreach ($scriptTags as $scriptTag) {
-            if (strpos($scriptTag->innertext, 'window.chapters') !== false) {
-                $script = $scriptTag;
-                break;
-            }
-        }
-
-        // Ensure script tag was found
-        if ($script === null) {
-            throw new Exception("Unable to find chapters data in script tags.");
-        }
-
-        // Extract and decode the chapters data
-        preg_match('/window\.chapters = (\[.*?\]);/', $script->innertext, $matches);
-        $chaptersJson = $matches[1] ?? '';
-        $chapters = json_decode($chaptersJson, true);
+        $chapters = ChapterHtmlParser::getChapters($html);
 
         return $this->chapterTransformer->transform($chapters);
     }
@@ -102,9 +82,7 @@ class ChapterService implements ChapterServiceInterface
     protected function fetchChapterContent($url)
     {
         $html = $this->htmlWeb->load($url);
-        
-        $contentElement = $html->find('.chapter-inner.chapter-content', 0);
-        return $contentElement !== null ? trim($contentElement->text()) : null;
+        return ChapterHtmlParser::getContent($html);    
     }
     
     
