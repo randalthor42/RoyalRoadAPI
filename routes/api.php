@@ -19,10 +19,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/fictions/{fiction}', [FictionController::class, 'show']);
-Route::get('/fictions/{fiction}/chapters', [FictionController::class, 'chapters']);
-Route::get('/fictions/{fiction}/chapters/{chapter}', [FictionController::class, 'showChapter']);
+//Fiction routes
+Route::get('/fiction/{fiction}', [FictionController::class, 'show']);
+Route::get('/fiction/{fiction}/chapters', [FictionController::class, 'chapters']);
+Route::get('/fiction/{fiction}/chapters/{chapter}', [FictionController::class, 'showChapter']);
 
+
+//Chapter routes
 Route::get('/chapters/{chapter}', [ChapterController::class, 'show']);
 
 Route::get('/authors/{id}', [AuthorController::class, 'show']);
