@@ -38,6 +38,26 @@ class ChapterService implements ChapterServiceInterface
         }
         return $this->chapters;
     }
+    
+    /**
+     * Returns a specific chapter.
+     *
+     * @param string $novelId
+     * @param string $chapterId
+     * @param HtmlWeb|null $html
+     * @return array|null
+     */
+    public function getChapter($novelId, $chapterId, $html = null)
+    {
+        $chapters = $this->getChapters($novelId, $html);
+        $chapter = $chapters[$chapterId] ?? null;
+        if ($chapter) {
+            $chapterUrl = "https://www.royalroad.com{$chapter['url']}";
+            $chapter['content'] = $this->fetchChapterContent($chapterUrl);
+        }
+        return $chapter;
+
+    }
 
     /**
      * Fetches and transforms the chapters data.
@@ -78,4 +98,14 @@ class ChapterService implements ChapterServiceInterface
 
         return $this->chapterTransformer->transform($chapters);
     }
+
+    protected function fetchChapterContent($url)
+    {
+        $html = $this->htmlWeb->load($url);
+        
+        $contentElement = $html->find('.chapter-inner.chapter-content', 0);
+        return $contentElement !== null ? trim($contentElement->text()) : null;
+    }
+    
+    
 }

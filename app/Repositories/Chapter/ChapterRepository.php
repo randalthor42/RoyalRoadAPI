@@ -18,4 +18,9 @@ class ChapterRepository implements ChapterRepositoryInterface
     {
         return $this->chapterService->getChapters($novelId, $html);
     }
+    
+    public function getChapter($novelId, $chapterId, $html = null)
+    {
+        return $this->chapterService->getChapter($novelId, $chapterId, $html);
+    }
 }

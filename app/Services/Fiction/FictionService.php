@@ -79,18 +79,21 @@ class FictionService implements FictionServiceInterface
     {
         $results = [];
         $methods = [
-            'chapters' => 'getChapters',
+            'chapters' => 'getFictionChapters',
             'author' => 'getAuthor',
         ];
-
+    
         foreach ($includes as $include) {
-            if (isset($methods[$include])) {
+            if (strpos($include, 'chapters:') === 0) {
+                $chapterId = substr($include, strlen('chapters:'));
+                $results['chapter'] = $this->getFictionChapter($id, $chapterId, $html);
+            } elseif (isset($methods[$include])) {
                 $results[$include] = $this->{$methods[$include]}($id, $html);
             }
         }
-
+    
         return $results;
-    }
+    }    
 
     /**
      * Load HTML document from a given URL
@@ -148,7 +151,6 @@ class FictionService implements FictionServiceInterface
         return $warnings;
     }
 
-
     /**
      *  Extract description from the HTML document
      * 
@@ -179,21 +181,6 @@ class FictionService implements FictionServiceInterface
     }
 
     /**
-     * Fetch all chapters of a novel
-     * 
-     * @param string $id
-     * @param HtmlDocument $html
-     * @return array
-     */
-    protected function getChapters($id, HtmlDocument $html)
-    {
-        if ($this->chapterService === null) {
-            throw new Exception("ChapterService is not set.");
-        }
-        return $this->chapterService->getChapters($id, $html);
-    }
-
-    /**
      * Fetch the author details for a novel
      * 
      * @param string $id
@@ -208,4 +195,28 @@ class FictionService implements FictionServiceInterface
 
         return $this->authorService->getAuthor($id);
     }
+
+    /**
+     * Fetch all chapters of a fiction
+     * 
+     * @param string $fictionId
+     * @return array
+     */
+    public function getFictionChapters($fictionId, $html = null)
+    {
+        return $this->chapterService->getChapters($fictionId);
+    }
+
+    /**
+     * Fetch a specific chapter of a fiction.
+     *  
+     * @param string $fictionId
+     * @return array
+     */
+    public function getFictionChapter($fictionId, $chapterId, $html = null)
+    {
+        return $this->chapterService->getChapter($fictionId, $chapterId);
+    }
+
+
 }

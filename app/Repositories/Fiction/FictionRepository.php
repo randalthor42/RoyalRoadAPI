@@ -17,4 +17,16 @@ class FictionRepository implements FictionRepositoryInterface
     {
         return $this->fictionService->getFiction($id, $includes);
     }
+    
+    public function getFictionChapters($fictionId, $html)
+    {
+        return $this->fictionService->getFictionChapters($fictionId, $html);
+    }
+
+    public function getFictionChapter($fictionId, $chapterId, $html)
+    {
+        return $this->fictionService->getFictionChapter($fictionId, $chapterId, $html);
+    }
+
+    
 }
