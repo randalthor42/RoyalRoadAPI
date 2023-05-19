@@ -2,9 +2,12 @@
 
 namespace App\Services\Fiction;
 
+use App\DTOs\FictionDto;
+use App\Parsers\FictionHtmlParser;
 use App\Services\Chapter\ChapterServiceInterface;
 use simplehtmldom\HtmlWeb;
 use simplehtmldom\HtmlDocument;
+use App\Handlers\FictionIncludeHandler;
 use Exception;
 
 class FictionService implements FictionServiceInterface
@@ -37,16 +40,17 @@ class FictionService implements FictionServiceInterface
      * @param array $includes
      * @return array
      */
-    public function getFiction($id, $includes = [])
+    public function getFiction($id, $includes = []): FictionDto
     {
         $url = "https://www.royalroad.com/fiction/{$id}";
         $html = $this->loadUrl($url);
-
-        return array_merge(
-            $this->getFictionDetails($id, $html),
-            $this->getIncludes($id, $html, $includes)
-        );
+    
+        $details = $this->getFictionDetails($id, $html);
+        $includes = $this->getIncludes($id, $html, $includes);
+    
+        return new FictionDto($details['id'], $details['title'], $details['tags'], $details['warnings'], $details['description'], $details['cover'], $includes);
     }
+    
 
     /**
      * Extracts novel details from the HTML document
@@ -59,11 +63,11 @@ class FictionService implements FictionServiceInterface
     {
         return [
             'id' => $id,
-            'title' => $this->getTitle($html),
-            'tags' => $this->getTags($html),
-            'warnings' => $this->getWarnings($html),
-            'description' => $this->getDescription($html),
-            'cover' => $this->getCover($html),
+            'title' => FictionHtmlParser::getTitle($html),
+            'tags' => FictionHtmlParser::getTags($html),
+            'warnings' => FictionHtmlParser::getWarnings($html),
+            'description' => FictionHtmlParser::getDescription($html),
+            'cover' => FictionHtmlParser::getCover($html),
         ];
     }
 
@@ -77,22 +81,9 @@ class FictionService implements FictionServiceInterface
      */
     protected function getIncludes($id, HtmlDocument $html, array $includes)
     {
-        $results = [];
-        $methods = [
-            'chapters' => 'getFictionChapters',
-            'author' => 'getAuthor',
-        ];
-    
-        foreach ($includes as $include) {
-            if (strpos($include, 'chapters:') === 0) {
-                $chapterId = substr($include, strlen('chapters:'));
-                $results['chapter'] = $this->getFictionChapter($id, $chapterId, $html);
-            } elseif (isset($methods[$include])) {
-                $results[$include] = $this->{$methods[$include]}($id, $html);
-            }
-        }
-    
-        return $results;
+      
+        $includeHandler = new FictionIncludeHandler($this);    
+        return $includeHandler->handle($id, $html, $includes);
     }    
 
     /**
@@ -104,80 +95,6 @@ class FictionService implements FictionServiceInterface
     protected function loadUrl($url)
     {
         return $this->htmlWeb->load($url);
-    }
-
-    /**
-     *  Extract title from the HTML document
-     * 
-     * @param HtmlDocument $html
-     * @return string
-     */
-    protected function getTitle(HtmlDocument $html)
-    {
-        return $html->find('h1', 0)->text();
-    }
-
-    /**
-     *  Extract the novel tags from the HTML document
-     * 
-     * @param HtmlDocument $html
-     * @return array
-     */
-    protected function getTags(HtmlDocument $html)
-    {
-        $tagsElements = $html->find('.fiction-info .tags a');
-        $tags = [];
-
-        foreach ($tagsElements as $tagElement) {
-            $tags[] = $tagElement->text();
-        }
-
-        return $tags;
-    }
-
-    /**
-     *  Extract the warnings tags from the HTML document
-     * 
-     * @param HtmlDocument $html
-     * @return array
-     */
-    protected function getWarnings(HtmlDocument $html)
-    {
-        $warningDetails = $html->find('.fiction-info div.text-center.font-red-sunglo strong:contains("Warning") ~ ul.list-inline li');
-        $warnings = [];
-        foreach ($warningDetails as $detail) {
-            $warnings[] = $detail->text();
-        }
-        return $warnings;
-    }
-
-    /**
-     *  Extract description from the HTML document
-     * 
-     * @param HtmlDocument $html
-     * @return string
-     */
-    protected function getDescription(HtmlDocument $html)
-    {
-        $descriptionParagraphs = $html->find('.fiction-info .description .hidden-content p');
-        $description = '';
-
-        foreach ($descriptionParagraphs as $paragraph) {
-            $description .= $paragraph->plaintext . "\n";
-        }
-
-        return trim($description);
-    }
-
-    /**
-     * Extract cover image URL from the HTML document
-     * 
-     * @param HtmlDocument $html
-     * @return string
-     */
-    protected function getCover(HtmlDocument $html)
-    {
-        return $html->find('.cover-art-container img', 0)->src;
     }
 
     /**
@@ -217,6 +134,4 @@ class FictionService implements FictionServiceInterface
     {
         return $this->chapterService->getChapter($fictionId, $chapterId);
     }
-
-
 }

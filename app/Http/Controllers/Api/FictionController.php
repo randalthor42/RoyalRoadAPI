@@ -29,8 +29,9 @@ class FictionController extends Controller
     public function show(Request $request, $id)
     {
         $includes = explode(',', $request->get('includes', ''));
-        $novel = $this->fictionRepository->getFiction($id, $includes);
-        return response()->json($novel);
+        $fiction = $this->fictionRepository->getFiction($id, $includes);
+        
+        return response()->json($fiction);
     }
 
     public function chapters(Request $request, $id)
