@@ -20,7 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 //Fiction routes
-//Route::get('/fiction/{fiction}', [FictionController::class, 'show']);
+Route::get('/fiction/{fiction}', [FictionController::class, 'show']);
 Route::get('/fiction/{fiction}/chapters', [FictionController::class, 'chapters']);
 Route::get('/fiction/{fiction}/chapters/{chapter}', [FictionController::class, 'showChapter']);
 
