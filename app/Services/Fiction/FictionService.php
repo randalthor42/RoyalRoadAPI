@@ -12,24 +12,21 @@ use Exception;
 
 class FictionService implements FictionServiceInterface
 {
-    /** @var HtmlWeb */
-    protected $htmlWeb;
+    /** @var FictionSourceInterface */
+    protected $fictionSource;
 
     /** @var ChapterServiceInterface */
     protected $chapterService;
-
-    /** @var AuthorServiceInterface */
-    protected $authorService;
-
     /**
      * FictionService constructor.
      *
-     * @param HtmlWeb $htmlWeb
+     * @param FictionSourceInterface $fictionSource
      * @param ChapterServiceInterface $chapterService
+     * @param AuthorServiceInterface $authorService
      */
-    public function __construct(HtmlWeb $htmlWeb ,ChapterServiceInterface $chapterService)
+    public function __construct(FictionSourceInterface $fictionSource ,ChapterServiceInterface $chapterService)
     {
-        $this->htmlWeb = $htmlWeb;
+        $this->fictionSource = $fictionSource;
         $this->chapterService = $chapterService;
     }
 
@@ -42,33 +39,12 @@ class FictionService implements FictionServiceInterface
      */
     public function getFiction($id, $includes = []): FictionDto
     {
-        $url = "https://www.royalroad.com/fiction/{$id}";
-        $html = $this->loadUrl($url);
-    
-        $details = $this->getFictionDetails($id, $html);
+
+        $html = $this->fictionSource->loadFiction($id);
+        $details = $this->fictionSource->getFictionDetails($id, $html);
         $includes = $this->getIncludes($id, $html, $includes);
     
         return new FictionDto($details['id'], $details['title'], $details['tags'], $details['warnings'], $details['description'], $details['cover'], $includes);
-    }
-    
-
-    /**
-     * Extracts novel details from the HTML document
-     * 
-     * @param string $id
-     * @param HtmlDocument $html
-     * @return array
-     */
-    protected function getFictionDetails($id, HtmlDocument $html)
-    {
-        return [
-            'id' => $id,
-            'title' => FictionHtmlParser::getTitle($html),
-            'tags' => FictionHtmlParser::getTags($html),
-            'warnings' => FictionHtmlParser::getWarnings($html),
-            'description' => FictionHtmlParser::getDescription($html),
-            'cover' => FictionHtmlParser::getCover($html),
-        ];
     }
 
     /**
@@ -85,33 +61,6 @@ class FictionService implements FictionServiceInterface
         $includeHandler = new FictionIncludeHandler($this);    
         return $includeHandler->handle($id, $html, $includes);
     }    
-
-    /**
-     * Load HTML document from a given URL
-     * 
-     * @param string $url
-     * @return HtmlDocument
-     */
-    protected function loadUrl($url)
-    {
-        return $this->htmlWeb->load($url);
-    }
-
-    /**
-     * Fetch the author details for a novel
-     * 
-     * @param string $id
-     * @param HtmlDocument $html
-     * @return array
-     */
-    protected function getAuthor($id, HtmlDocument $html)
-    {
-        if ($this->authorService === null) {
-            throw new Exception("AuthorService is not set.");
-        }
-
-        return $this->authorService->getAuthor($id);
-    }
 
     /**
      * Fetch all chapters of a fiction
