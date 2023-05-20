@@ -21,10 +21,10 @@ class FictionIncludeHandler
             $includeParts = explode(':', $include);
             $includeType = $includeParts[0];
             $includeValue = $includeParts[1] ?? null;
-    
+
             switch ($includeType) {
                 case 'chapters':
-                    if ($includeValue) {
+                    if ($includeValue != null) {
                         $results['chapter'] = $this->fictionService->getFictionChapter($id, $includeValue, $html);
                     } else {
                         $results['chapters'] = $this->fictionService->getFictionChapters($id, $html);
