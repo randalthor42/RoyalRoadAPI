@@ -71,7 +71,7 @@ class FictionApiTest extends TestCase
     {
         $fictionId = '26675';
         $chapterId = '0';
-        $response = $this->get("/api/fiction/{$fictionId}?includes=chapter:{$chapterId}");
+        $response = $this->get("/api/fiction/{$fictionId}?includes=chapters:{$chapterId}");
 
         $response->assertStatus(200);
 
