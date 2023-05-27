@@ -3,18 +3,18 @@
 namespace App\Repositories\Fiction;
 
 use App\Services\Fiction\FictionServiceInterface;
+use App\Websites\WebsiteManager;
 
 class FictionRepository implements FictionRepositoryInterface
 {
     protected $fictionService;
+    protected $website;
 
-    public function __construct(FictionServiceInterface $fictionService)
-    {
-        $this->fictionService = $fictionService;
-    }
+    
 
     public function getFiction($id, $includes = [])
     {
+        $this->fictionService = app(FictionServiceInterface::class);
         return $this->fictionService->getFiction($id, $includes);
     }
     
@@ -27,6 +27,5 @@ class FictionRepository implements FictionRepositoryInterface
     {
         return $this->fictionService->getFictionChapter($fictionId, $chapterId, $html);
     }
-
     
 }

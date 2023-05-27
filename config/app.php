@@ -170,6 +170,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\ServiceServiceProvider::class,
         App\Providers\RepositoryServiceProvider::class,
+        App\Providers\ParserRegistryServiceProvider::class,
     ])->toArray(),
 
     /*

@@ -1,19 +1,28 @@
 <?php
-namespace App\Parsers;
+namespace App\Parsers\RoyalRoad;
 
+use App\Parsers\ParserInterface;
 use Exception;
 use simplehtmldom\HtmlDocument;
+use simplehtmldom\HtmlWeb;
 
-class ChapterHtmlParser
+class ChapterParser implements ParserInterface
 {
+    protected $htmlWeb;
 
-    /**
-     * Parse the chapter list from the HTML document
-     *
-     * @param HtmlDocument $html
-     * @return array
-     * @throws Exception
-     */
+    public function __construct(HtmlWeb $htmlWeb)
+    {
+        $this->htmlWeb = $htmlWeb;
+    }
+
+    public function parse($novelId, $html = null): array
+    {
+        if ($html === null) {
+            $url = "https://www.royalroad.com/fiction/{$novelId}";
+            $html = $this->htmlWeb->load($url);
+        }
+        return $this->getChapters($html);
+    }
 
     public static function getChapters(HtmlDocument $html): array
     {
@@ -54,12 +63,7 @@ class ChapterHtmlParser
         return trim(preg_replace('/\s+/', ' ', $title));
     }
 
-    /**
-     * Extract chapter content from the HTML document
-     *
-     * @param HtmlDocument $html
-     * @return string
-     */
+   
     public static function getContent(HtmlDocument $html): string
     {
         $content = $html->find('.chapter-inner.chapter-content', 0)->text();

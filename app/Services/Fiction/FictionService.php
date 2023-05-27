@@ -6,25 +6,28 @@ use App\DTOs\FictionDto;
 use App\Services\Chapter\ChapterServiceInterface;
 use simplehtmldom\HtmlDocument;
 use App\Handlers\FictionIncludeHandler;
+use App\Parsers\ParserRegistry;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class FictionService implements FictionServiceInterface
 {
-    /** @var FictionSourceInterface */
-    protected $fictionSource;
+    /** @var ParserRegistry */
+    protected $parserRegistry;
 
     /** @var ChapterServiceInterface */
     protected $chapterService;
+
     /**
      * FictionService constructor.
      *
-     * @param FictionSourceInterface $fictionSource
+     * @param ParserRegistry $parserRegistry
      * @param ChapterServiceInterface $chapterService
-     * @param AuthorServiceInterface $authorService
      */
-    public function __construct(FictionSourceInterface $fictionSource ,ChapterServiceInterface $chapterService)
+    public function __construct(ParserRegistry $parserRegistry, ChapterServiceInterface $chapterService)
     {
-        $this->fictionSource = $fictionSource;
-        $this->chapterService = $chapterService;
+        $this->parserRegistry = $parserRegistry;
+        $this->chapterService = $chapterService;        
     }
 
     /**
@@ -36,10 +39,9 @@ class FictionService implements FictionServiceInterface
      */
     public function getFiction($id, $includes = []): FictionDto
     {
-
-        $html = $this->fictionSource->loadFiction($id);
-        $details = $this->fictionSource->getFictionDetails($id, $html);
-        $includes = $this->getIncludes($id, $html, $includes);
+        $fictionParser = $this->parserRegistry->getParser('fiction');
+        $details = $fictionParser->parse($id);
+        $includes = $this->getIncludes($id, $fictionParser->getHtml(), $includes);
     
         return new FictionDto($details['id'], $details['title'], $details['tags'], $details['warnings'], $details['description'], $details['cover'], $includes);
     }
@@ -55,7 +57,7 @@ class FictionService implements FictionServiceInterface
     protected function getIncludes($id, HtmlDocument $html, array $includes)
     {
       
-        $includeHandler = new FictionIncludeHandler($this);    
+        $includeHandler = new FictionIncludeHandler($this, $this->parserRegistry);    
         return $includeHandler->handle($id, $html, $includes);
     }    
 
@@ -80,4 +82,5 @@ class FictionService implements FictionServiceInterface
     {
         return $this->chapterService->getChapter($fictionId, $chapterId);
     }
+
 }

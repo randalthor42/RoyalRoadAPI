@@ -3,6 +3,7 @@
 namespace App\Services\Chapter;
 
 use App\Parsers\ChapterHtmlParser;
+use App\Parsers\ParserRegistry;
 use App\Services\Chapter\ChapterServiceInterface;
 use App\Transformers\ChapterTransformer;
 use simplehtmldom\HtmlWeb;
@@ -15,13 +16,17 @@ class ChapterService implements ChapterServiceInterface
     /** @var ChapterTransformer */
     protected $chapterTransformer;
 
+    /** @var ParserRegistry */
+    protected $parserRegistry;
+
     /** @var Array */
     protected $chapters;
 
-    public function __construct(HtmlWeb $htmlWeb, ChapterTransformer $chapterTransformer)
+    public function __construct(HtmlWeb $htmlWeb, ChapterTransformer $chapterTransformer, ParserRegistry $parserRegistry)
     {
         $this->htmlWeb = $htmlWeb;
         $this->chapterTransformer = $chapterTransformer;
+        $this->parserRegistry = $parserRegistry;
     }
 
     /**
@@ -36,7 +41,7 @@ class ChapterService implements ChapterServiceInterface
         if (!isset($this->chapters)) {
             $this->chapters = $this->fetchChapters($novelId, $html);
         }
-        return $this->chapters;
+        return $this->chapterTransformer->transform($this->chapters);
     }
     
     /**
@@ -68,22 +73,14 @@ class ChapterService implements ChapterServiceInterface
      */
     private function fetchChapters($novelId, $html = null)
     {
-       // If $html is null, fetch it from the web
-        if ($html === null) {
-            $url = "https://www.royalroad.com/fiction/{$novelId}";
-            $html = $this->htmlWeb->load($url);
-        }
-
-        $chapters = ChapterHtmlParser::getChapters($html);
-
-        return $this->chapterTransformer->transform($chapters);
+        $chapterParser = $this->parserRegistry->getParser('chapters');
+        return $chapterParser->parse($novelId, $html);
     }
 
     protected function fetchChapterContent($url)
     {
-        $html = $this->htmlWeb->load($url);
-        return ChapterHtmlParser::getContent($html);    
+        $chapterContentParser = $this->parserRegistry->getParser('chapterContent');
+        return $chapterContentParser->parse($url);
     }
-    
     
 }

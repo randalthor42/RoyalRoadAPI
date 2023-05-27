@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services\Fiction;
+use App\Websites\Website;
 
 interface FictionServiceInterface
 {
@@ -9,6 +10,5 @@ interface FictionServiceInterface
     public function getFictionChapters($fictionId, $html);
 
     public function getFictionChapter($fictionId, $chapterId, $html);
-
 
 }

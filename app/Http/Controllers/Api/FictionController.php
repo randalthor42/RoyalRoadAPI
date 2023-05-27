@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Repositories\Fiction\FictionRepositoryInterface;
 use App\Repositories\Chapter\ChapterRepositoryInterface;
-use App\Transformers\FictionTransformer;
 use Illuminate\Http\Request;
 
 class FictionController extends Controller
@@ -16,21 +15,17 @@ class FictionController extends Controller
     /** @var ChapterRepositoryInterface */
     protected $chapterRepository;
 
-    /** @var FictionTransformer */
-    protected $transformer;
-
-    public function __construct(FictionRepositoryInterface $fictionRepository, FictionTransformer $transformer, ChapterRepositoryInterface $chapterRepository)
+    public function __construct(FictionRepositoryInterface $fictionRepository, ChapterRepositoryInterface $chapterRepository)
     {
         $this->fictionRepository = $fictionRepository;
-        $this->transformer   = $transformer;
         $this->chapterRepository = $chapterRepository;
     }
 
-    public function show(Request $request, $id)
-    {
+    public function show(Request $request, $website, $id)
+    {    
         $includes = explode(',', $request->get('includes', ''));
         $fiction = $this->fictionRepository->getFiction($id, $includes);
-        
+    
         return response()->json($fiction);
     }
 
