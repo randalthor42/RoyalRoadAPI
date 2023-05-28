@@ -20,7 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 //Fiction API endpoints
-Route::group(['prefix' => '/{website}', 'namespace' => 'Api', 'middleware' => \App\Http\Middleware\SetWebsiteForWebsiteContext::class], function () {
+Route::group(['prefix' => '/{website}', 'namespace' => 'Api', 'middleware' => 'api' ], function () {
     Route::get('/fiction/{fiction}', [FictionController::class, 'show']);
     Route::get('/fiction/{fiction}/chapters', [FictionController::class, 'chapters']);
     Route::get('/fiction/{fiction}/chapters/{chapter}', [FictionController::class, 'showChapter']);

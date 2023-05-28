@@ -6,6 +6,12 @@ use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
 {
+
+    protected $routeMiddleware = [
+        'api.key.auth' => \App\Http\Middleware\ApiKeyAuth::class,
+        'api.key.check' => \App\Http\Middleware\CheckApiKey::class,
+    ];
+    
     /**
      * The application's global HTTP middleware stack.
      *
@@ -37,9 +43,10 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
-
         'api' => [
             \App\Http\Middleware\SetWebsiteForWebsiteContext::class,
+            \App\Http\Middleware\ApiKeyAuth::class,
+            \App\Http\Middleware\CheckApiKey::class,
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,

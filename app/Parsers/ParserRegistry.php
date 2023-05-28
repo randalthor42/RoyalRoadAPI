@@ -4,6 +4,7 @@ namespace App\Parsers;
 use App\Websites\Website;
 use App\Websites\WebsiteContext;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ParserRegistry
 {
@@ -34,7 +35,9 @@ class ParserRegistry
         $websiteConfig = config('websites.'.$websiteName);
         $parserClass = $websiteConfig['parsers'][$parserType];
 
-        return $this->parserFactory->make($parserClass);
+        return Cache::remember("parser.{$websiteName}.{$parserClass}", 60, function () use ($parserClass) {
+            return $this->parserFactory->make($parserClass);
+        });
     }
 
 }

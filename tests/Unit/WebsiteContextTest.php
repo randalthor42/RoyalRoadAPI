@@ -12,6 +12,6 @@ class WebsiteContextTest extends TestCase
         $websiteManager = new WebsiteManager();
         $websiteContext = new WebsiteContext();
         $websiteContext->setWebsite($websiteManager->getWebsite('royalroad'));;
-        $this->assertEquals('example', $websiteContext->getWebsite());
+        $this->assertEquals('royalroad', $websiteContext->getWebsite()->getName());
     }
 }
