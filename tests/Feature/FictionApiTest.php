@@ -2,31 +2,17 @@
 
 namespace Tests\Feature;
 
-use App\Parsers\ParserFactory;
-use App\Parsers\ParserRegistry;
-use App\Websites\Website;
-use App\Websites\WebsiteContext;
-use App\Websites\WebsiteManager;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class FictionApiTest extends TestCase
 {
+    private $baseRoute = "/api/royalroad";
+    private $fictionId = '26675';
+    private $chapterId = '0';
 
-    /**
-     * Test fetching a fiction without chapters included.
-     *
-     * @return void
-     */
-    public function testFetchingFiction()
+    private function getFictionJsonStructure(bool $includeChapters = false): array
     {
-        $fictionId = '26675';
-        $response = $this->get("/api/royalroad/fiction/{$fictionId}");
-
-        $response->assertStatus(200);
-
-        $response->assertJsonStructure([
+        $structure = [
             'id',
             'title',
             'tags',
@@ -34,27 +20,10 @@ class FictionApiTest extends TestCase
             'description',
             'cover',
             'includes'
-        ]);
-    }
+        ];
 
-    /**
-     * Test fetching a fiction with included chapters.
-     *
-     * @return void
-     */
-    public function testFetchingFictionWithIncludedChapters()
-    {
-        $fictionId = '26675';
-        $response = $this->get("/api/royalroad/fiction/{$fictionId}?includes=chapters");
-
-        $response->assertStatus(200)->assertJsonStructure([
-            'id',
-            'title',
-            'tags',
-            'warnings',
-            'description',
-            'cover',
-            'includes' => [
+        if ($includeChapters) {
+            $structure['includes'] = [
                 'chapters' => [
                     '*' => [
                         'id',
@@ -64,20 +33,45 @@ class FictionApiTest extends TestCase
                         'url',
                     ],
                 ],
-            ],
-        ]);
+            ];
+        }
+
+        return $structure;
     }
 
-    /**
-     * Test fetching a specific fiction chapter with include.
-     *
-     * @return void
-     */
+    private function getChapterJsonStructure(): array
+    {
+        return [
+            'id',
+            'volumeId',
+            'title',
+            'date',
+            'url',
+            'content'
+        ];
+    }
+
+    public function testFetchingFiction()
+    {
+        $response = $this->get("{$this->baseRoute}/fiction/{$this->fictionId}");
+
+        $response->assertStatus(200);
+
+        $response->assertJsonStructure($this->getFictionJsonStructure());
+    }
+
+    public function testFetchingFictionWithIncludedChapters()
+    {
+        $response = $this->get("{$this->baseRoute}/fiction/{$this->fictionId}?includes=chapters");
+
+        $response->assertStatus(200);
+
+        $response->assertJsonStructure($this->getFictionJsonStructure(true));
+    }
+
     public function testFetchingFictionChapterWithInclude()
     {
-        $fictionId = '26675';
-        $chapterId = '0';
-        $response = $this->get("/api/royalroad/fiction/{$fictionId}?includes=chapters:{$chapterId}");
+        $response = $this->get("{$this->baseRoute}/fiction/{$this->fictionId}?includes=chapters:{$this->chapterId}");
 
         $response->assertStatus(200);
 
@@ -89,83 +83,43 @@ class FictionApiTest extends TestCase
             'description',
             'cover',
             'includes' => [
-                '*' => [
-                    'id',
-                    'volumeId',
-                    'title',
-                    'date',
-                    'url',
-                    'content'
-                ]
+                '*' => $this->getChapterJsonStructure()
             ]
         ]);
     }
 
-    /**
-     * Test fetching a specific fiction chapter.
-     *
-     * @return void
-     */
     public function testFetchingSpecificFictionChapter()
     {
-        $fictionId = '26675';
-        $chapterId = '0';
-        $response = $this->get("/api/royalroad/fiction/{$fictionId}/chapters/{$chapterId}");
+        $response = $this->get("{$this->baseRoute}/fiction/{$this->fictionId}/chapters/{$this->chapterId}");
 
         $response->assertStatus(200);
 
-        $response->assertJsonStructure([
-            'id',
-            'volumeId',
-            'title',
-            'date',
-            'url',
-            'content'
-        ]);
+        $response->assertJsonStructure($this->getChapterJsonStructure());
     }
-    
-    /**
-     * Test fetching the list of chapters for a fiction.
-     *
-     * @return void
-     */
+
     public function testFetchingChapterList()
     {
-        $fictionId = '26675';
-        $response = $this->get("/api/royalroad/fiction/{$fictionId}/chapters");
-
-        $response->assertStatus(200)
-            ->assertJsonStructure([
-                '*' => [
-                    'id',
-                    'volumeId',
-                    'title',
-                    'date',
-                    'url',
-                ],
-            ]);
-    }
-
-    /**
-     * Test fetching the content of a specific chapter.
-     *
-     * @return void
-     */
-    public function testFetchingChapterContent()
-    {
-        $fictionId = '26675';
-        $chapterId = '0';
-        $response = $this->get("/api/royalroad/fiction/{$fictionId}/chapters/{$chapterId}");
+        $response = $this->get("{$this->baseRoute}/fiction/{$this->fictionId}/chapters");
 
         $response->assertStatus(200);
 
         $response->assertJsonStructure([
-            'id',
-            'volumeId',
-            'title',
-            'date',
-            'url',
-            'content'
+            '*' => [
+                'id',
+                'volumeId',
+                'title',
+                'date',
+                'url',
+            ],
         ]);
+    }
+
+    public function testFetchingChapterContent()
+    {
+        $response = $this->get("{$this->baseRoute}/fiction/{$this->fictionId}/chapters/{$this->chapterId}");
+
+        $response->assertStatus(200);
+
+        $response->assertJsonStructure($this->getChapterJsonStructure());
     }
 }
