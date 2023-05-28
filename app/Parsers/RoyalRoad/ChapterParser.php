@@ -15,10 +15,10 @@ class ChapterParser implements ParserInterface
         $this->htmlWeb = $htmlWeb;
     }
 
-    public function parse($novelId, $html = null): array
+    public function parse($fictionId, $html = null): array
     {
+        $url = "https://www.royalroad.com/fiction/{$fictionId}";
         if ($html === null) {
-            $url = "https://www.royalroad.com/fiction/{$novelId}";
             $html = $this->htmlWeb->load($url);
         }
         return $this->getChapters($html);

@@ -29,13 +29,14 @@ class FictionController extends Controller
         return response()->json($fiction);
     }
 
-    public function chapters(Request $request, $id)
+    public function chapters(Request $request, $website, $fictionId)
     {
-        $chapters = $this->chapterRepository->getChapters($id);
+        $chapters = $this->chapterRepository->getChapters($fictionId);
         return response()->json($chapters);
     }
+    
 
-    public function showChapter(Request $request, $fictionId, $chapterId)
+    public function showChapter(Request $request,$website, $fictionId, $chapterId)
     {
         $chapter = $this->chapterRepository->getChapter($fictionId, $chapterId);
         return response()->json($chapter);

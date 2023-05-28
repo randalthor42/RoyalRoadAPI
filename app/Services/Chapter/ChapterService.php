@@ -32,14 +32,14 @@ class ChapterService implements ChapterServiceInterface
     /**
      * Returns all chapters.
      *
-     * @param string $novelId
+     * @param string $fictionId
      * @param HtmlWeb|null $html
      * @return array
      */
-    public function getChapters($novelId, $html = null)
+    public function getChapters($fictionId, $html = null)
     {
         if (!isset($this->chapters)) {
-            $this->chapters = $this->fetchChapters($novelId, $html);
+            $this->chapters = $this->fetchChapters($fictionId, $html);
         }
         return $this->chapterTransformer->transform($this->chapters);
     }
@@ -47,14 +47,14 @@ class ChapterService implements ChapterServiceInterface
     /**
      * Returns a specific chapter.
      *
-     * @param string $novelId
+     * @param string $fictionId
      * @param string $chapterId
      * @param HtmlWeb|null $html
      * @return array|null
      */
-    public function getChapter($novelId, $chapterId, $html = null)
+    public function getChapter($fictionId, $chapterId, $html = null)
     {
-        $chapters = $this->getChapters($novelId, $html);
+        $chapters = $this->getChapters($fictionId, $html);
         $chapter = $chapters[$chapterId] ?? null;
         if ($chapter) {
             $chapterUrl = "https://www.royalroad.com{$chapter['url']}";
@@ -67,14 +67,14 @@ class ChapterService implements ChapterServiceInterface
     /**
      * Fetches and transforms the chapters data.
      *
-     * @param string $novelId
+     * @param string $fictionId
      * @param HtmlWeb|null $html
      * @return array
      */
-    private function fetchChapters($novelId, $html = null)
+    private function fetchChapters($fictionId, $html = null)
     {
         $chapterParser = $this->parserRegistry->getParser('chapters');
-        return $chapterParser->parse($novelId, $html);
+        return $chapterParser->parse($fictionId, $html);
     }
 
     protected function fetchChapterContent($url)

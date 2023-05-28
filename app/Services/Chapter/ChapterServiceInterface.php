@@ -4,7 +4,7 @@ namespace App\Services\Chapter;
 
 interface ChapterServiceInterface
 {
-    public function getChapters($novelId, $html = null);
+    public function getChapters($fictionId, $html = null);
     
-    public function getChapter($novelId, $chapterId, $html = null);
+    public function getChapter($fictionId, $chapterId, $html = null);
 }

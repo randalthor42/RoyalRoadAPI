@@ -2,12 +2,18 @@
 
 namespace Tests\Feature;
 
+use App\Parsers\ParserFactory;
+use App\Parsers\ParserRegistry;
+use App\Websites\Website;
+use App\Websites\WebsiteContext;
+use App\Websites\WebsiteManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class FictionApiTest extends TestCase
 {
+
     /**
      * Test fetching a fiction without chapters included.
      *
@@ -16,7 +22,7 @@ class FictionApiTest extends TestCase
     public function testFetchingFiction()
     {
         $fictionId = '26675';
-        $response = $this->get("/api/fiction/{$fictionId}");
+        $response = $this->get("/api/royalroad/fiction/{$fictionId}");
 
         $response->assertStatus(200);
 
@@ -39,7 +45,7 @@ class FictionApiTest extends TestCase
     public function testFetchingFictionWithIncludedChapters()
     {
         $fictionId = '26675';
-        $response = $this->get("/api/fiction/{$fictionId}?includes=chapters");
+        $response = $this->get("/api/royalroad/fiction/{$fictionId}?includes=chapters");
 
         $response->assertStatus(200)->assertJsonStructure([
             'id',
@@ -71,7 +77,7 @@ class FictionApiTest extends TestCase
     {
         $fictionId = '26675';
         $chapterId = '0';
-        $response = $this->get("/api/fiction/{$fictionId}?includes=chapters:{$chapterId}");
+        $response = $this->get("/api/royalroad/fiction/{$fictionId}?includes=chapters:{$chapterId}");
 
         $response->assertStatus(200);
 
@@ -104,7 +110,7 @@ class FictionApiTest extends TestCase
     {
         $fictionId = '26675';
         $chapterId = '0';
-        $response = $this->get("/api/fiction/{$fictionId}/chapters/{$chapterId}");
+        $response = $this->get("/api/royalroad/fiction/{$fictionId}/chapters/{$chapterId}");
 
         $response->assertStatus(200);
 
@@ -126,7 +132,7 @@ class FictionApiTest extends TestCase
     public function testFetchingChapterList()
     {
         $fictionId = '26675';
-        $response = $this->get("/api/fiction/{$fictionId}/chapters");
+        $response = $this->get("/api/royalroad/fiction/{$fictionId}/chapters");
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -149,7 +155,7 @@ class FictionApiTest extends TestCase
     {
         $fictionId = '26675';
         $chapterId = '0';
-        $response = $this->get("/api/fiction/{$fictionId}/chapters/{$chapterId}");
+        $response = $this->get("/api/royalroad/fiction/{$fictionId}/chapters/{$chapterId}");
 
         $response->assertStatus(200);
 
