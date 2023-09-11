@@ -13,42 +13,46 @@ Welcome to the Fiction API, a RESTful API designed to interact with fiction stor
 ## Installation
 
 1. Clone this repository.
-\```bash
+
+```bash
 git clone https://github.com/randalthor42/RoyalRoadAPI.git
-\```
+```
 
 2. Navigate to the project directory.
-\```bash
+
+```bash
 cd RoyalRoadAPI
-\```
+```
 
 3. Install the required dependencies.
-\```bash
+
+```bash
 npm install
 composer update
-\```
+```
 
 4. Create a copy of the `.env.example` file and rename it to `.env`.
-\```bash
+
+```bash
 cp .env.example .env
-\```
+```
 
 5. Update the `.env` file with your database configuration details.
 
 6. Run the database migrations.
-\```bash
+```bash
 php artisan migrate
-\```
+```
 
 7. Generate an API key for your application using the custom Artisan command.
-\```bash
+```bash
 php artisan api:generate-key [USER_ID] [RATE_LIMIT]
-\```
+```
 
 8. Start the server.
-\```bash
+```bash
 php artisan serve
-\```
+```
 
 ## Usage with Postman
 
