@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\{FictionController};
+use App\Http\Controllers\Api\{AuthorController, FictionController};
 
 /*
 |--------------------------------------------------------------------------
@@ -24,4 +24,6 @@ Route::group(['prefix' => '/{website}', 'namespace' => 'Api', 'middleware' => 'a
     Route::get('/fiction/{fiction}', [FictionController::class, 'show']);
     Route::get('/fiction/{fiction}/chapters', [FictionController::class, 'chapters']);
     Route::get('/fiction/{fiction}/chapters/{chapter}', [FictionController::class, 'showChapter']);
+
+    Route::get('/author/{userId}', [AuthorController::class, 'show']);
 });

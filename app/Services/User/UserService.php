@@ -3,31 +3,40 @@
 namespace App\Services\User;
 
 use App\Services\User\UserServiceInterface;
-use App\Transformers\UserTransformer;
-use simplehtmldom\HtmlWeb;
+use App\Parsers\ParserRegistry;
+use App\DTOs\UserDto;
 
 class UserService implements UserServiceInterface
 {
-    /** @var HtmlWeb */
-    protected $htmlWeb;
+    /** @var ParserRegistry */
+    protected $parserRegistry;
 
-    /** @var UserTransformer */
-    protected $userTransformer;
 
-    public function __construct(HtmlWeb $htmlWeb, UserTransformer $userTransformer)
+    /**
+     * UserService constructor.
+     *
+     * @param ParserRegistry $parserRegistry
+     */
+    public function __construct(ParserRegistry $parserRegistry)
     {
-        $this->htmlWeb = $htmlWeb;
-        $this->userTransformer = $userTransformer;
+        $this->parserRegistry = $parserRegistry;
+
     }
 
-    public function getUserById($id)
+     /**
+     * Get Author details by author ID.
+     * 
+     * @param string $authorId
+     * @return UserDto
+     */
+    public function getAuthorById($authorId): UserDto
     {
-        return $id;
+        $authorParser = $this->parserRegistry->getParser('author');
+        $details = $authorParser->parse($authorId);
+        return new UserDto(
+            $details['username'], 
+            $details['joinedDate'],
+        );
     }
 
-    public function getAuthor($novelId)
-    {
-        $author = '';
-        return $author;
-    }
 }

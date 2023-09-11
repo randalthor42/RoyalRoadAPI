@@ -6,6 +6,7 @@ return [
             'fiction' => \App\Parsers\RoyalRoad\FictionParser::class,
             'chapters' => \App\Parsers\RoyalRoad\ChapterParser::class,
             'chapterContent' => \App\Parsers\RoyalRoad\ChapterContentParser::class,
+            'author' => \App\Parsers\RoyalRoad\AuthorParser::class,
         ],
     ],
 ];

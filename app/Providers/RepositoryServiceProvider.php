@@ -7,6 +7,8 @@ use App\Repositories\Chapter\ChapterRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\Fiction\FictionRepositoryInterface;
 use App\Repositories\Fiction\FictionRepository;
+use App\Repositories\User\UserRepository;
+use App\Repositories\User\UserRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -14,5 +16,6 @@ class RepositoryServiceProvider extends ServiceProvider
     {
         $this->app->bind(FictionRepositoryInterface::class, FictionRepository::class);
         $this->app->bind(ChapterRepositoryInterface::class, ChapterRepository::class);
+        $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
     }
 }
